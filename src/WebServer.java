@@ -1,3 +1,5 @@
+package TP1Securite;
+
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -44,11 +46,11 @@ public class WebServer {
 	String httpVersion = "";
 	
 	protected String createResponseString(String httpVersion, String contentType) {
-		String output = "";
-		output += httpVersion + " 200 OK\n";
-		output += "Content-Type: " + contentType + "\n";
-		output += "Server: localhost\n";
-		return output;
+		String response = "";
+		response += httpVersion + " 200 OK\n";
+		response += "Content-Type: " + contentType + "\n";
+		response += "Server: localhost\n";
+		return response;
 	}
 	
 	protected void start(int port_no) {
@@ -73,7 +75,8 @@ public class WebServer {
 	    
 	    while(true) {
 	    	
-	      try {
+	      try 
+	      {
 	        /**
 	         * Waiting for connexion
 	         */
@@ -86,13 +89,63 @@ public class WebServer {
 	        BufferedReader in = new BufferedReader(new InputStreamReader(sockClient.getInputStream()));
 	        PrintWriter out = new PrintWriter(sockClient.getOutputStream());
 	        
-
+	        String request = in.readLine();
+	        System.out.println("Requête reçue: "+ request + "\n");
+	        if(request == null) 
+	        {
+	        	out.flush();
+	        	sockClient.close();
+	        	continue;
+	        }
+	        
+	        String[] arrayReq = request.split(" "); //of the form "GET /path HTTPX.X"
+	        
 	        System.out.println("Envoi du contenu...");	        
 	        
 	        try 
 	        {
-		        		        	
-		        
+	        	if (arrayReq[0].equals("GET")) 
+	        	{
+	        		/*
+		        	 * Vérification du path donné dans la requête
+		        	 */
+		        	if (arrayReq.length == 3 || (arrayReq.length == 2 && pathRegex.matcher(arrayReq[1]).find())) {
+		        		//si path contient ..
+		        		if (arrayReq[1].indexOf("..") != -1) {
+		        			out.println("400 bad request");
+		        		}
+		        		else {
+		        			pathOk = true;
+		        		}
+		        	}
+		        	else {
+		        		//aucun path : erreur
+		        		out.println("404 not found");
+		        	}
+
+		        	/*
+		        	 * Vérification de la version HTTP donnée dans la requête
+		        	 */
+		        	if ((arrayReq.length == 3 && !httpRegex.matcher(arrayReq[2]).find()) || 
+		        			(arrayReq.length == 2 && !httpRegex.matcher(arrayReq[1]).find())) {
+		        		out.println("505 HTTP version not supported");
+		        	}
+		        	else {
+		        		httpOk = true;
+		        		if (arrayReq.length == 3 && httpRegex.matcher(arrayReq[2]).find()) {
+		        			httpVersion = arrayReq[2];
+		        		}
+		        		else if (arrayReq.length == 2 && httpRegex.matcher(arrayReq[1]).find()) {
+		        			httpVersion = arrayReq[1];
+		        		}
+		        		else {
+		        			httpVersion = "HTTP/0.9";
+		        		}
+		        	}
+
+
+		        	if(pathOk && httpOk)
+		        	{
 			        	String algorithm = "";
 			        	String filename = "";
 						String path = arrayReq[1];
@@ -206,7 +259,7 @@ public class WebServer {
 							 */
 							if (algorithm.equals("RC4")) 
 							{
-								RC4 rc4 = new RC4(filecontent);
+								//RC4 rc4 = new RC4(filecontent);
 								
 								out.println(upperTemplate);
 								out.println(filecontent); //THIS IS WHERE THE OUTPUT GOES
@@ -222,7 +275,7 @@ public class WebServer {
 							}
 							else if (algorithm.equals("Authentication")) 
 							{
-								Authentication auth = new Authentication(filecontent);
+								MAC mac = new MAC(filecontent);
 							}
 							else if (algorithm.equals("Hach")) 
 							{
@@ -231,111 +284,115 @@ public class WebServer {
 							else {
 								System.err.println("Wrong algorithm. Choose from (RC4, Feistel, Hach, CBC, Authentication).");
 							}
-						
-						if (br != null) br.close();	
-						
-						
-						
-						
-						
-						
-						
-						/**
-						 * Send response according to file type
-						 */
-						/*if(extension.equals("HTML") || extension.equals("TXT")) {
-							BufferedReader br = null;
-							if (extension.equals("HTML")) {
-								File htmlFile = new File(path);
-								int htmlFileLength = (int)htmlFile.length();
-								//Send to browser/telnet
-								out.println(httpVersion + " 200 OK");
-								out.println("Content-Type: text/html");
-								//out.println("Content-length: " + htmlFileLength);
-								out.println("Server: localhost");
-								out.println("");
-								
-								br = new BufferedReader(new FileReader(htmlFile));
-							}
-							else if (extension.equals("TXT"))
-							{
-								File textFile = new File(path);
-								int textFileLength = (int)textFile.length();
-								//Send to browser/telnet
-								out.println(httpVersion + " 200 OK");
-								out.println("Content-Type: text/plain");
-								out.println("Content-length: " + textFileLength);
-								out.println("Server: localhost");
-								out.println("");
-								
-								br = new BufferedReader(new FileReader(textFile));
-							}
-							//send to client
-							try {
-								while((s = br.readLine()) != null) {
-									out.println(s);
+							
+							if (br != null) br.close();	
+							
+							
+							
+							
+							
+							
+							
+							/**
+							 * Send response according to file type
+							 */
+							/*if(extension.equals("HTML") || extension.equals("TXT")) {
+								BufferedReader br = null;
+								if (extension.equals("HTML")) {
+									File htmlFile = new File(path);
+									int htmlFileLength = (int)htmlFile.length();
+									//Send to browser/telnet
+									out.println(httpVersion + " 200 OK");
+									out.println("Content-Type: text/html");
+									//out.println("Content-length: " + htmlFileLength);
+									out.println("Server: localhost");
+									out.println("");
+									
+									br = new BufferedReader(new FileReader(htmlFile));
 								}
-							}
-							catch (FileNotFoundException e) {
-								System.out.print(e.toString());
-								out.println("404 not found");
-							}
-							finally {
-								br.close();
-							}
-						}
-						else if (extension.equals("JPG") || extension.equals("JPEG") || extension.equals("GIF"))
-						{
-							File fileImg = new File(path);
-							int fileLength = (int)fileImg.length();
-							if (extension.equals("JPG") || extension.equals("JPEG"))
-							{
-								//Send to browser/telnet
-								out.println(httpVersion + " 200 OK");
-								out.println("Content-Type: image/jpeg");
-								out.println("Content-length: " + fileLength);
-								out.println("Server: localhost");
-								out.println("");
-							}
-							else if (extension.equals("GIF"))
-							{
-								//Send to browser/telnet
-								out.println(httpVersion + " 200 OK");
-								out.println("Content-Type: image/gif");
-								out.println("Content-length: " + fileLength);
-								out.println("Server: localhost");
-								out.println("");
-							}
-							//send to client
-							try {
-								//lecture d'un fichier binaire dans un buffer d'octets
-						        byte[] buffer = new byte[fileLength];
-						        FileInputStream inputStream = null;
-						        try {
-						        	inputStream = new FileInputStream(fileImg);
-									inputStream.read(buffer);
-						        }
+								else if (extension.equals("TXT"))
+								{
+									File textFile = new File(path);
+									int textFileLength = (int)textFile.length();
+									//Send to browser/telnet
+									out.println(httpVersion + " 200 OK");
+									out.println("Content-Type: text/plain");
+									out.println("Content-length: " + textFileLength);
+									out.println("Server: localhost");
+									out.println("");
+									
+									br = new BufferedReader(new FileReader(textFile));
+								}
+								//send to client
+								try {
+									while((s = br.readLine()) != null) {
+										out.println(s);
+									}
+								}
+								catch (FileNotFoundException e) {
+									System.out.print(e.toString());
+									out.println("404 not found");
+								}
 								finally {
-									inputStream.close();
+									br.close();
 								}
-						        binOut.write(buffer, 0, fileLength);
-								
 							}
-							catch (FileNotFoundException e)
+							else if (extension.equals("JPG") || extension.equals("JPEG") || extension.equals("GIF"))
 							{
-								System.out.print(e.toString());
-								out.println("404 not found");
+								File fileImg = new File(path);
+								int fileLength = (int)fileImg.length();
+								if (extension.equals("JPG") || extension.equals("JPEG"))
+								{
+									//Send to browser/telnet
+									out.println(httpVersion + " 200 OK");
+									out.println("Content-Type: image/jpeg");
+									out.println("Content-length: " + fileLength);
+									out.println("Server: localhost");
+									out.println("");
+								}
+								else if (extension.equals("GIF"))
+								{
+									//Send to browser/telnet
+									out.println(httpVersion + " 200 OK");
+									out.println("Content-Type: image/gif");
+									out.println("Content-length: " + fileLength);
+									out.println("Server: localhost");
+									out.println("");
+								}
+								//send to client
+								try {
+									//lecture d'un fichier binaire dans un buffer d'octets
+							        byte[] buffer = new byte[fileLength];
+							        FileInputStream inputStream = null;
+							        try {
+							        	inputStream = new FileInputStream(fileImg);
+										inputStream.read(buffer);
+							        }
+									finally {
+										inputStream.close();
+									}
+							        binOut.write(buffer, 0, fileLength);
+									
+								}
+								catch (FileNotFoundException e)
+								{
+									System.out.print(e.toString());
+									out.println("404 not found");
+								}
 							}
-						}
-						else {
-							out.println("404 not found");
-						}*/
+							else {
+								out.println("404 not found");
+							}*/
+				        }
+			        else {
+			        	out.println("400 Bad Request");
 			        }
-		        }
+			    }
 		        else {
-		        	out.println("405 Method not allowed");
+		        	out.println("405 method not allowed");
 		        }
 	        }
+	    }
 	        catch (Exception e)
 	        {
 	        	System.out.print(e.toString());
@@ -344,14 +401,13 @@ public class WebServer {
 	        
 	        out.flush();
 		    sockClient.close();
-		    binOut.close();
 	        
-	        
-	      } catch (Exception e) {
+	      } 
+	      catch (Exception e) {
 	        System.out.println("Error: " + e);
 	      }
-	    }
-	   }
+	    } //end of while(true)
+	}
 	
 	public static void main(String[] args) {
 		int port_no = 0;
