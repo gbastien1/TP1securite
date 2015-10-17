@@ -38,5 +38,21 @@ public class BitsManager {
 		return binaryMessage.toString();
 	}
 
+
+	public String bitsToString(String bitsString) {
+		//Split every nth character found here: 
+		//http://stackoverflow.com/questions/12295711/split-a-string-at-every-nth-position
+		int count = 8;
+		String[] bitsbytes = bitsString.split("(?<=\\G.{" + count + "})");
+
+		String messageInChars = "";
+		for (String b : bitsbytes) {
+			int val = Integer.parseInt(b, 2);
+			messageInChars += Character.toChars(val)[0];
+		}
+
+		return messageInChars;
+	}
+
 	
 }
