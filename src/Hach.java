@@ -3,7 +3,7 @@ package TP1Securite;
 import java.util.ArrayList;
 
 /**
- * This hash function uses SHA-512 algorithm
+ * This hash function is the simplest: xor on chunks of bits of fixed size
  *
  * steps:
  * 1- split message of n bits into b blocks (n should be a factor of b)
@@ -58,35 +58,7 @@ public class Hach {
 	}
 
 	
-	/**
-	 * This method takes a string of characters as input,
-	 * and transforms it into a string of corresponding bits
-	 * @param  message the message of chars to transform
-	 * @return         the message written in binary
-	 */
-	//Found at http://stackoverflow.com/questions/917163/convert-a-string-like-testing123-to-binary-in-java
-	private String stringToBits(String message) {
-		byte[] bytes = message.getBytes();
-		StringBuilder binaryMessage = new StringBuilder();
-		
-		//transform bytes to bits
-		for (byte b : bytes)
-		{
-			int val = b;
-			for (int i = 0; i < 8; i++)
-			{
-				/**
-				 * what this does:
-				 * 	-it compares the 8th bit of val with 0 using a '1000000' bit mask. if it is 0, append 0, else append 1.
-				 * 	-it then shifts the bits one position to the left and compares again for the 7 other bits of the byte
-				 */
-				binaryMessage.append((val & 128) == 0 ? 0 : 1);
-				val <<= 1;
-			}
-			//binaryMessage.append(' '); //no need for spaces, only for debug purpose
-		}
-		return binaryMessage.toString();
-	}
+	
 
 	/**
 	 * This is the actual simple hach function. It takes a message in parameters,
@@ -97,12 +69,13 @@ public class Hach {
 	 * @return         the hash code corresponding to the message
 	 */
 	public String hachMessage(String message) {
+		BitsManager bitsManager = new BitsManager();
 		int chunkSize = 64;
 		String hashcode = "";
 		ArrayList<String> chunks = new ArrayList<String>();
 
 		//get corresponding bits
-		String bits = stringToBits(message);
+		String bits = bitsManager.stringToBits(message);
 
 		//pad the bits string
 		int index = 0;

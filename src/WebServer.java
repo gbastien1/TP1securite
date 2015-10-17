@@ -277,7 +277,20 @@ public class WebServer {
 							}
 							else if (algorithm.equals("Authentication")) 
 							{
-								MAC mac = new MAC(filecontent);
+								MAC mac = new MAC();
+								String key = "11100011";
+								String signedMessage = mac.sign(filecontent, key);
+								
+
+								//send to client
+								out.println(upperTemplate);
+								out.println("This is the actual message in clear: \n");
+								out.println(filecontent + '\n');
+								out.println("This is the binary version of the hashed signed message: \n");
+								out.println(signedMessage + '\n');
+								//There should be a comparison between hashcode received and 
+								//hashcode produced by algorithm used by the receiver with its own private key.
+								out.println(lowerTemplate);
 							}
 							else if (algorithm.equals("Hach")) 
 							{
