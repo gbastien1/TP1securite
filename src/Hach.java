@@ -1,5 +1,7 @@
 package TP1Securite;
 
+import java.util.ArrayList;
+
 /**
  * This hash function uses SHA-512 algorithm
  *
@@ -19,10 +21,49 @@ package TP1Securite;
 
 public class Hach {
 
-	public Hach(String filecontent) {
-		stringToBits(filecontent);
+	public Hach() {	
 	}
 
+	/**
+	 * This method applies a xor to a number of integers
+	 * and returns a binary representation of the result
+	 * @param  intChunks chunks of bits as integers to apply XOR on
+	 * @return           the result of XOR as binary string
+	 */
+	private String xor(long[] intChunks) {
+		if (intChunks.length < 2) {
+			return Long.toBinaryString(intChunks[0]);
+		}
+		int index = 0;
+		long newChunk;
+		newChunk = intChunks[0] ^ intChunks[1];
+		for (int i = 2; i < intChunks.length; i++)
+		{
+			newChunk = newChunk ^ intChunks[i]; //^ is Java's xor operator on integers
+		}
+		
+		return Long.toBinaryString(newChunk);
+	}
+
+	/**
+	 * This method checks if number is a factor of factor
+	 * @param  factor the number to divide by
+	 * @param  number the number to compare its factors
+	 * @return   true if number is factor of factor, false otherwise
+	 */
+	//Found at http://www.exploringbinary.com/ten-ways-to-check-if-an-integer-is-a-power-of-two-in-c/
+	private boolean isFactorOf(int factor, int number)
+	{
+	 	return number % factor == 0;
+	}
+
+	
+	/**
+	 * This method takes a string of characters as input,
+	 * and transforms it into a string of corresponding bits
+	 * @param  message the message of chars to transform
+	 * @return         the message written in binary
+	 */
 	//Found at http://stackoverflow.com/questions/917163/convert-a-string-like-testing123-to-binary-in-java
 	private String stringToBits(String message) {
 		byte[] bytes = message.getBytes();
@@ -44,12 +85,63 @@ public class Hach {
 			}
 			//binaryMessage.append(' '); //no need for spaces, only for debug purpose
 		}
-		System.out.println("'" + message + "' to binary: " + binaryMessage);
 		return binaryMessage.toString();
 	}
 
-	public String hashMessage(String message) {
-		return null;
+	/**
+	 * This is the actual simple hach function. It takes a message in parameters,
+	 * transforms it into a string of bits, pad the string with '10000...' bits to 
+	 * make it a factor of 64 bits, then separates it into chunks of 64 bits, and
+	 * applies a XOR on each nth bit of each chunk to produce a 64 bits string result.
+	 * @param  message the message to hach, in chars
+	 * @return         the hash code corresponding to the message
+	 */
+	public String hachMessage(String message) {
+		int chunkSize = 64;
+		String hashcode = "";
+		ArrayList<String> chunks = new ArrayList<String>();
+
+		//get corresponding bits
+		String bits = stringToBits(message);
+
+		//pad the bits string
+		int index = 0;
+		while (!isFactorOf(chunkSize, bits.length())) {
+			if (index == 0) {
+				bits += '1';
+			}
+			else {
+				bits += '0';
+			}
+			index++;
+		}
+
+		//divide bits in chunks of chunkSize bits
+		int numberOfChunks = bits.length() / chunkSize;
+		for (int n = 0; n < numberOfChunks; n++)
+		{
+			String chunk = "";
+			for (int i = 0; i < chunkSize; i++)
+			{
+				chunk += bits.charAt(i + n * chunkSize);
+			}
+			chunks.add(chunk);
+		}
+
+		//XOR on each chunk to produce hash code
+		//first: get the chunks and get integers from them
+		long[] integerChunks = new long[numberOfChunks];
+		
+		for (int i = 0; i < chunks.size(); i++) 
+		{
+			long val = Long.parseLong(chunks.get(i), 2); //gets long from binary string
+			integerChunks[i] = val;
+		}
+		
+		//then: xor all the chunks to form a hash code
+		hashcode = xor(integerChunks);
+
+		return hashcode;
 	}
 	
 }

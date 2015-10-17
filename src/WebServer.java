@@ -52,6 +52,8 @@ public class WebServer {
 		response += "Server: localhost\n";
 		return response;
 	}
+
+	
 	
 	protected void start(int port_no) {
 	    ServerSocket ss;
@@ -279,7 +281,11 @@ public class WebServer {
 							}
 							else if (algorithm.equals("Hach")) 
 							{
-								Hach hach = new Hach(filecontent);
+								Hach hach = new Hach();
+								String hachedMessage = hach.hachMessage(filecontent);
+								out.println(upperTemplate);
+								out.println(hachedMessage);
+								out.println(lowerTemplate);
 							}
 							else {
 								System.err.println("Wrong algorithm. Choose from (RC4, Feistel, Hach, CBC, Authentication).");

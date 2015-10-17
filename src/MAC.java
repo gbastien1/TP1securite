@@ -4,7 +4,7 @@ package TP1Securite;
 public class MAC {
 	
 	public MAC(String filecontent) {
-		Hach hashFct = new Hach(filecontent);
+		Hach hashFct = new Hach();
 	}
 
 	

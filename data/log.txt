@@ -1,1 +1,1 @@
-texte
+Ceci est un texte a hacher. Les licornes sont jolies et les pouliches aussi. Les chevaux galopent la criniere dans le vent et les vaches mangent de l'herbe paisiblement. Ce texte peut etre assez long mais pas trop pour eviter une lenteur du traitement. Ce n'est qu'un exemple apres tout.
