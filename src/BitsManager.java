@@ -1,5 +1,7 @@
 package TP1Securite;
 
+import java.util.ArrayList;
+
 /**
  * This manipulates strings to transform them to bits
  */
@@ -52,6 +54,48 @@ public class BitsManager {
 		}
 
 		return messageInChars;
+	}
+
+	/**
+	 * This method checks if number is a factor of factor
+	 * @param  factor the number to divide by
+	 * @param  number the number to compare its factors
+	 * @return   true if number is factor of factor, false otherwise
+	 */
+	//Found at http://www.exploringbinary.com/ten-ways-to-check-if-an-integer-is-a-power-of-two-in-c/
+	private boolean isFactorOf(int factor, int number)
+	{
+	 	return number % factor == 0;
+	}
+
+	public String[] splitInChunks(String bits, int chunkSize) {
+		ArrayList<String> chunks = new ArrayList<String>();
+
+		//pad the bits string
+		int index = 0;
+		while (!isFactorOf(chunkSize, bits.length())) {
+			if (index == 0) {
+				bits += '1';
+			}
+			else {
+				bits += '0';
+			}
+			index++;
+		}
+		
+		//divide bits in chunks of chunkSize bits
+		int numberOfChunks = bits.length() / chunkSize;
+		for (int n = 0; n < numberOfChunks; n++)
+		{
+			String chunk = "";
+			for (int i = 0; i < chunkSize; i++)
+			{
+				chunk += bits.charAt(i + n * chunkSize);
+			}
+			chunks.add(chunk);
+		}
+		String[] chunksString = new String[chunks.size()];
+		return chunks.toArray(chunksString);
 	}
 
 	

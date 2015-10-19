@@ -72,42 +72,20 @@ public class Hach {
 		BitsManager bitsManager = new BitsManager();
 		int chunkSize = 64;
 		String hashcode = "";
-		ArrayList<String> chunks = new ArrayList<String>();
 
 		//get corresponding bits
 		String bits = bitsManager.stringToBits(message);
-
-		//pad the bits string
-		int index = 0;
-		while (!isFactorOf(chunkSize, bits.length())) {
-			if (index == 0) {
-				bits += '1';
-			}
-			else {
-				bits += '0';
-			}
-			index++;
-		}
-
-		//divide bits in chunks of chunkSize bits
-		int numberOfChunks = bits.length() / chunkSize;
-		for (int n = 0; n < numberOfChunks; n++)
-		{
-			String chunk = "";
-			for (int i = 0; i < chunkSize; i++)
-			{
-				chunk += bits.charAt(i + n * chunkSize);
-			}
-			chunks.add(chunk);
-		}
+		
+		//split bits in chunks of chunkSize bits
+		String[] chunks = bitsManager.splitInChunks(bits, chunkSize);
 
 		//XOR on each chunk to produce hash code
 		//first: get the chunks and get integers from them
-		long[] integerChunks = new long[numberOfChunks];
+		long[] integerChunks = new long[chunks.length];
 		
-		for (int i = 0; i < chunks.size(); i++) 
+		for (int i = 0; i < chunks.length; i++) 
 		{
-			long val = Long.parseLong(chunks.get(i), 2); //gets long from binary string
+			long val = Long.parseLong(chunks[i], 2); //gets long from binary string
 			integerChunks[i] = val;
 		}
 		

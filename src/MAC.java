@@ -23,7 +23,7 @@ public class MAC {
 	 * to a message using a "secret" key
 	 * @param  message the message to sign
 	 * @param  key     the "secret" key used in HMAC in binary
-	 * @return         the signed message in binary
+	 * @return         the hashcode in binary used as signature
 	 */
 	public String sign(String message, String key) {
 		BitsManager bitsManager = new BitsManager();
@@ -52,9 +52,19 @@ public class MAC {
 	}
 	
 
-	public String compare(String encryptedMessage, String hashcode) {
+	/**
+	 * This function takes as parameter the message in clear and the hashcode
+	 * encrypted using the secret 8 bit key
+	 * @param  message 		The message to authenticate
+	 * @param  hashcode     the hashcode used as digital signature
+	 * @param  key  		the secret key the client knows
+	 * @return              boolean true if comparison matched, false otherwise
+	 */
+	public boolean compare(String message, String hashcode, String key) {
+		boolean verdict = false;
+		String hashcode_client = sign(message, key);
 
-		return null;
+		return hashcode_client.equals(hashcode);
 	}
 	
 }
