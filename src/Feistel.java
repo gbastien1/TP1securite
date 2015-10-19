@@ -3,25 +3,31 @@ package TP1Securite;
 import java.util.Random;
 import java.util.ArrayList;
 
-//Found at http://www.commentcamarche.net/forum/affich-25066859-cryptography-algorithme-de-feistel-en-java-c
-
 public class Feistel {
 	ArrayList<String> TabKey = new ArrayList<String>();
 	String ciphertext;
 
 	public Feistel() {}
 
-	private String pseudo(char block, String key){	      //Pseudo-aléatoire
-		int intBlock = Integer.parseInt(block);
-		int intKey = Integer.parseInt(key);
-
-		intBlock = (intBlock * 7 + 3) % 256;
-		intBlock = intBlock & intKey;
-		return Integer.toBinaryString(intBlock);
+	private String F(String message, String key)
+	{
+		String result = "";
+		for(int i = 0; i < 16; i++)
+		{
+			if(message.charAt(i) == key.charAt(i))
+			{
+				result = result + "1";
+			}
+			else
+			{
+				result = result + "0";
+			}
+		}
+		return result;
 	}
 
-	private String keyGenerator()
-	{
+	private String keyGenerator() 
+	{ //key fourni ?
 		Random rand = new Random();
 		String key;
 		for(int i = 0; i < 16; i++)
@@ -32,52 +38,35 @@ public class Feistel {
 		return key;
 	}
 
-	private void simpletour(String plaintext){ //À refaire!
+	private String simpletour(String left, String right){ // Ajouter Key
 		int counter = 0;
-		String key = keyGenerator();
-		TabKey.add(key);
-
-		/**
-		 * Feistel
-		 * 1- Get message in binary
-		 * 2- pad it so it is a factor of 32
-		 * 3- separate message into chunks of 32 bits
-		 * 4- for each chunk, apply 16 rounds
-		 * 5- round: 	separate 32 bits into 2 x 16 bits
-		 * 				take 2nd, apply pseudo with 1st key, xor this with 1st
-		 * 				take 2nd, append previous, and loop. 
-		 */
-		while(counter < plaintext.length()){
-			ciphertext.charAt(2*counter) = plaintext.charAt(2*counter+1);
-			ciphertext.charAt(2*counter+1) = plaintext.charAt(2*counter) ^ pseudo(plaintext.charAt(2*counter+1), key);	
-			counter++;
-		}
+//		String key = keyGenerator();
+//		TabKey.add(key);
+		String temp = null;
+		temp = F(right, key);
+		temp = temp ^ left;
+		return = right + temp;
 	}
 
-	public String encrypt(String message, int nbtours){
-		String plaintext = bitsManager.stringToBits(message);
-		ciphertext = plaintext;
+	public String encrypt(String message, String key, int nbtours){
+		String bits = bitsManager.stringToBits(message);
+		String[] plaintext = bitsManager.splitInChunks(bits, 32)
+		String[] ciphertext = plaintext;
 
-		String temp;
-		while(nbtours > 0){
-			simpletour(plaintext);
-			temp = plaintext;
-			plaintext = ciphertext;
-			ciphertext = temp;
-			nbtours--;
+		for(int i = 0; i < plaintext.lenght();i++)
+		{
+			while(nbtours > 0)
+			{
+				ciphertext[i] = simpletour(ciphertext[i].substring(0,15), plaintext.substring(15));
+				nbtours--;
+			}
 		}
-		return ciphertext;
+
+		return ciphertext = ciphertext.substring(15) + ciphertext.substring(0,15);
 	}
 
-	public String decrypt(String ciphertext, int nbtours){
-		String temp;
-		while(nbtours > 0){
-			simpletour(ciphertext);
-			temp = ciphertext;
-			ciphertext = plaintext;
-			ciphertext = temp;
-			nbtours--;
-		}
-		return plaintext;
-	}
+
+
+
+
 }
