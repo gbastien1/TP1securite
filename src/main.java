@@ -10,6 +10,16 @@ import java.util.Random;
 public class main {
 
 	protected static int MAC_key;
+	protected static int[] RC4_key;
+
+	private static int[] generateKey(int length) {
+		Random rand = new Random();
+		int[] key = new int[length];
+		for (int i = 0; i < length; i++) {
+			key[i] = rand.nextInt(1);
+		}
+		return key;
+	}
 
 	/** 
 	 * @param no number associated to chosen algorithm by user
@@ -38,7 +48,9 @@ public class main {
 
 		}
 		else if (algorithm.equals("RC4")) {
-
+			RC4_key = generateKey(32);
+			RC4 rc4 = new RC4(RC4_key);
+			encryptedMessage = rc4.encrypt(message);
 		}
 		else if (algorithm.equals("Hach")) {
 			Hach hach = new Hach();
@@ -70,7 +82,8 @@ public class main {
 
 		}
 		else if (algorithm.equals("RC4")) {
-
+			RC4 rc4 = new RC4(RC4_key);
+			message = rc4.decrypt(encryptedMessage);
 		}
 		else if (algorithm.equals("Hach")) {
 			message = "Impossible d'effectuer le hachage en sens inverse.";
@@ -125,7 +138,6 @@ public class main {
 			String message = "";
 			do
 			{
-
 				System.out.println("Please enter corresponding number from list:\n"
 						+ "1- plain text\n"
 						+ "2- text from file\n");
