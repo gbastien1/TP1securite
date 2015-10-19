@@ -48,7 +48,7 @@ public class MAC {
 		String xor_key_opad_binary = Integer.toBinaryString(xor_key_opad);
 		xor_key_opad_binary += hashed_ipad;
 
-		return hashFct.hachMessage(xor_key_opad_binary);
+		return messageBits + hashFct.hachMessage(xor_key_opad_binary); //append hashcode to message in clear
 	}
 	
 
@@ -60,11 +60,15 @@ public class MAC {
 	 * @param  key  		the secret key the client knows
 	 * @return              boolean true if comparison matched, false otherwise
 	 */
-	public boolean compare(String message, String hashcode, String key) {
-		boolean verdict = false;
-		String hashcode_client = sign(message, key);
+	public boolean compare(String encryptedMessage, String key, int originalMessageLength) {
+		BitsManager bitsManager = new BitsManager();
+		String server_mess = encryptedMessage.substring(0, originalMessageLength);
+		String server_hashcode = encryptedMessage.substring(originalMessageLength, encryptedMessage.length());
 
-		return hashcode_client.equals(hashcode);
+		String client_mess = sign(bitsManager.bitsToString(server_mess), key);
+		String client_hashcode = client_mess.substring(originalMessageLength, client_mess.length());
+
+		return server_hashcode.equals(client_hashcode);
 	}
 	
 }

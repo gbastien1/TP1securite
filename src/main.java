@@ -5,8 +5,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.util.Random;
 
 public class main {
+
+	protected static int MAC_key;
 
 	/** 
 	 * @param no number associated to chosen algorithm by user
@@ -38,10 +41,16 @@ public class main {
 
 		}
 		else if (algorithm.equals("Hach")) {
-
+			Hach hach = new Hach();
+			encryptedMessage = hach.hachMessage(message);
 		}
 		else if (algorithm.equals("MAC")) {
-
+			MAC mac = new MAC();
+			//generate key for encryption
+			Random rand = new Random();
+			MAC_key = rand.nextInt(256); //get 8 bit key
+			//encrypt
+			encryptedMessage = mac.sign(message, Integer.toBinaryString(MAC_key));
 		}
 		else {
 			System.out.println("Mauvais algorithme! Choix possibles: [Feistel, RC4, Hach, MAC].\n");
@@ -53,9 +62,9 @@ public class main {
 	/**
 	 * Acting as the client, this function decrypts/compares the hash of the message returned by the client
 	 * @param encryptedMessage the message to decrypt / compare hash
-	 * @param algorithm        [The algorithm that was used by the server
+	 * @param algorithm        The algorithm that was used by the server
 	 */
-	public static String client(String encryptedMessage, String algorithm) {
+	public static String client(String encryptedMessage, String algorithm, int originalMessageLength) {
 		String message = "";
 		if (algorithm.equals("Feistel")) {
 
@@ -64,10 +73,18 @@ public class main {
 
 		}
 		else if (algorithm.equals("Hach")) {
-
+			message = "Impossible d'effectuer le hachage en sens inverse.";
 		}
 		else if (algorithm.equals("MAC")) {
+			MAC mac = new MAC();
+			boolean identical = mac.compare(encryptedMessage, Integer.toBinaryString(MAC_key), originalMessageLength);
 
+			if(identical) {
+				message = "La comparaison a fonctionné! C'est bel et bien server qui a envoyé le message!";
+			}
+			else {
+				message = "La comparaison a échoué! le message a été modifié!";
+			}
 		}
 		else {
 			System.out.println("Mauvais algorithme! Choix possibles: [Feistel, RC4, Hach, MAC].\n");
@@ -113,17 +130,19 @@ public class main {
 						+ "1- plain text\n"
 						+ "2- text from file\n");
 				userInput = userInputBR.readLine();
-				if (userInput.equals("1")) {
+				if (userInput.equals("1")) 
+				{
 					System.out.println("Please type in text directly and press enter: \n");
 					message = userInputBR.readLine();
 				}
-				else if (userInput.equals("2")) {
+				else if (userInput.equals("2"))
+				{
 					System.out.println("Please type in filename (do not forget its extension):\n");
-					userInput = userInputBR.readLine();
+					String filename = userInputBR.readLine();
 					/**
 					 * Read file with given filename
 					 */
-					br = new BufferedReader(new FileReader(userInput));
+					br = new BufferedReader(new FileReader("../data/" + filename));
 					message = "";
 					String s;
 					while((s = br.readLine()) != null) {
@@ -136,11 +155,13 @@ public class main {
 			}
 			while (Integer.parseInt(userInput) < 1 || Integer.parseInt(userInput) > 2);
 
-			System.out.println("Algorithm is " + algorithm + '\n');
-			System.out.println("Message in clear is " + message + '\n');
+			int originalMessageLength = message.length();
+
+			System.out.println("Algorithm is " + algorithm + "\n");
+			System.out.println("Message in clear is \"" + message + "\"\n");
 			String encryptedMessage = server(message, algorithm);
-			System.out.println("Server encrypted message. Result is " + encryptedMessage + '\n');
-			System.out.println("Client decrypted message. Result is " + client(encryptedMessage, algorithm) + '\n');
+			System.out.println("Server encrypted message. Result is \"" + encryptedMessage + "\"\n");
+			System.out.println("Client decrypted message. Result is \"" + client(encryptedMessage, algorithm, originalMessageLength) + "\"\n");
 		}
 		catch(Exception e) {
 			e.printStackTrace();
