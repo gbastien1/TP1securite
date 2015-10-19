@@ -4,21 +4,21 @@ package TP1Securite;
 
 public class RC4 {
 
-    private String[] S = new String[256];
-    private String[] T = new String[256];
+    private byte[] S = new byte[256];
+    private byte[] T = new byte[256];
     private int keylen;
-    private String[] key;
+    private byte[] key;
 
     public RC4() {
 
         keylen = key.length;
         for (int i = 0; i < 256; i++) {
-            S[i] = (String) i;
+            S[i] = (byte) i;
             T[i] = key[i % keylen];
         }
 
         int j = 0;
-        String tmp;
+        byte[] tmp;
         
         for (int i = 0; i < 256; i++) {
             j = (j + S[i] + T[i]) & 0xFF;
@@ -29,12 +29,11 @@ public class RC4 {
     }
 
     public String encrypt(String message) {
-
-    	String plaintext = bitsManager.stringToBits(message); 
+    	byte[] plaintext = message.getBytes();
         
-        String ciphertext = new String[plaintext.length];
+        byte[] ciphertext = new byte[plaintext.length];
         int i = 0, j = 0, k, t;
-        String tmp;
+        byte[] tmp;
         for (int counter = 0; counter < plaintext.length; counter++) {
             i = (i + 1) & 0xFF;
             j = (j + S[i]) & 0xFF;
@@ -43,7 +42,7 @@ public class RC4 {
             S[i] = tmp;
             t = (S[i] + S[j]) & 0xFF;
             k = S[t];
-            ciphertext[counter] = (String) (plaintext[counter] ^ k);
+            ciphertext[counter] = (byte) (plaintext[counter] ^ k);
         }
         return ciphertext;
     }
