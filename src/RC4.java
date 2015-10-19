@@ -18,7 +18,7 @@ public class RC4 {
         }
 
         int j = 0;
-        byte[] tmp;
+        byte tmp;
         
         for (int i = 0; i < 256; i++) {
             j = (j + S[i] + T[i]) & 0xFF;
@@ -33,7 +33,7 @@ public class RC4 {
         
         byte[] ciphertext = new byte[plaintext.length];
         int i = 0, j = 0, k, t;
-        byte[] tmp;
+        byte tmp;
         for (int counter = 0; counter < plaintext.length; counter++) {
             i = (i + 1) & 0xFF;
             j = (j + S[i]) & 0xFF;
@@ -44,7 +44,7 @@ public class RC4 {
             k = S[t];
             ciphertext[counter] = (byte) (plaintext[counter] ^ k);
         }
-        return ciphertext;
+        return ciphertext.toString();
     }
 
     public String decrypt(String ciphertext) {
