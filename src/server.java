@@ -1,3 +1,4 @@
+package TP1Securite;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -6,9 +7,19 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Random;
 
-public class server {
+public class Server {
 	
+	private static int[] generateRC4Key(int length) {
+		Random rand = new Random();
+		int[] key = new int[length];
+		for (int i = 0; i < length; i++) {
+			key[i] = rand.nextInt(2);
+		}
+		return key;
+	}
+
 	protected void start(int no_port) {
 		ServerSocket ss;
    	 
@@ -44,66 +55,67 @@ public class server {
 	        BufferedReader in = new BufferedReader(new InputStreamReader(sockClient.getInputStream()));
 	        PrintWriter out = new PrintWriter(sockClient.getOutputStream());
 	       
+	        String algorithm = in.readLine();
+	        System.out.println("Algorithme reçu: " + algorithm + "\n");
+			
+
+
 	       	String message = in.readLine();
 	       	System.out.println("Message reçu: " + message + "\n");
 
-	        //System.out.println("Envoi du contenu...");	        
+	        System.out.println("Encryption du message...\n");	        
 	        
 	        try 
 	        {
-	        	String algorithm = "";
-	        	String encryptedMessage = "";
-				String s = "";
-								
-				encryptedMessage = in.readLine();
-				if (encryptedMessage != null) {
-					out.println("OK");
-				}
+	        	String s = "";
+	        	String encryptedMessage = "";		
 				
 				/**
 				 * Else if file is .txt file, apply algorithm
 				 * and then add it to html template and send
 				 * template back to browser
 				 */
-				if(algorithm != null) { //this is a text file
-					
-					/**
-					 * Then, look at path to see which algorithm to decrypt or compare,
-					 */
-					/*if (algorithm.equals("RC4")) 
-					{
-						RC4 rc4 = new RC4(encryptedMessage);
-						//rc4.decrypt(encryptedMessage);
-						//phil
-						
+				if (algorithm.equals("Feistel")) {
+					out.println("key");
+					//TODO
+				}
+				else if (algorithm.equals("RC4")) {
+					int[] RC4_key = generateRC4Key(32);
+					//key to string
+					String key = "";
+					for (int i : RC4_key) {
+						key += Integer.toString(i);
 					}
-					else if (algorithm.equals("CBC")) 
-					{
-						CBC cbc = new CBC(encryptedMessage);
-						//?
-					}
-					else if (algorithm.equals("Feistel")) 
-					{
-						Feistel feistel = new Feistel(encryptedMessage);
-						//phil
-					}
-					else if (algorithm.equals("Authentication")) 
-					{
-						Authentication auth = new Authentication(encryptedMessage);
-						//moi
-					}
-					else if (algorithm.equals("Hach")) 
-					{
-						Hach hach = new Hach(encryptedMessage);
-						//moi
-					}*/
+					out.println(key);
+
+					RC4 rc4 = new RC4(RC4_key);
+					encryptedMessage = rc4.encrypt(message);
+				}
+				else if (algorithm.equals("Hach")) {
+					out.println("no key");
+					Hach hach = new Hach();
+					encryptedMessage = hach.hachMessage(message);
+				}
+				else if (algorithm.equals("MAC")) {
+					MAC mac = new MAC();
+					//generate key for encryption
+					Random rand = new Random();
+					int MAC_key = rand.nextInt(256); //get 8 bit key
+					//key in string
+					String string_key = "";
+					string_key += (char) MAC_key;
+					out.println(string_key);
+
+					//encrypt
+					encryptedMessage = mac.sign(message, Integer.toBinaryString(MAC_key));
 				}
 				else {
-					/**
-					 * do not need to decrypt or compare from any algorithm
-					 */
+					System.out.println("Mauvais algorithme! Choix possibles: [Feistel, RC4, Hach, MAC].\n");
 				}
-				
+				System.out.println("Envoi du message chiffré...\n");
+				out.println(encryptedMessage);
+
+	
 	        }
 	        catch (Exception e)
 	        {
@@ -112,7 +124,6 @@ public class server {
 	        }
 	        
 	        out.flush();
-		    sockClient.close();
 	        
 	      } catch (Exception e) {
 	        System.out.println("Error: " + e);
@@ -121,7 +132,22 @@ public class server {
 	}
 	
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
+		int port_no = 0;
+        if (args.length > 0) 
+        {
+            try {
+                port_no = Integer.parseInt(args[0]);
+                Server sw = new Server();
+                sw.start(port_no);
+            } 
+            catch (NumberFormatException e) {
+                System.err.println("Call example: Server 5000");
+                System.exit(1);
+            }
+         }
+       else {
+            System.err.println("Call example: Server 5000");
+        }
 
 	}
 
