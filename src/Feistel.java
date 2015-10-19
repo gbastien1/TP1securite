@@ -1,17 +1,17 @@
 package TP1Securite;
 
-//http://www.commentcamarche.net/forum/affich-25066859-cryptography-algorithme-de-feistel-en-java-c
+import java.util.Random;
+import java.util.ArrayList;
+
+//Found at http://www.commentcamarche.net/forum/affich-25066859-cryptography-algorithme-de-feistel-en-java-c
 
 public class Feistel {
 	ArrayList<String> TabKey = new ArrayList<String>();
+	String ciphertext;
 
-	public Feistel(String message) {
-		String plaintext = bitsManager.stringToBits(message); 
-        
-        String ciphertext = new String[plaintext.length];	
-	}
+	public Feistel() {}
 
-	private String pseudo(String block, String key){	      //Pseudo-aléatoire 
+	private String pseudo(char block, String key){	      //Pseudo-aléatoire
 		int intBlock = Integer.parseInt(block);
 		int intKey = Integer.parseInt(key);
 
@@ -20,31 +20,34 @@ public class Feistel {
 		return Integer.toBinaryString(intBlock);
 	}
 
-	public String keyGenerator()
+	private String keyGenerator()
 	{
+		Random rand = new Random();
 		String key;
 		for(int i = 0; i < 16; i++)
 		{
-			int randomNumber = random.nextInt(1) + 0;
+			int randomNumber = rand.nextInt(1) + 0;
 			key += Integer.toString(randomNumber);
 		}
 		return key;
 	}
 
-
-	public simpletour(String plaintext){
+	private void simpletour(String plaintext){ //À refaire!
 		int counter = 0;
 		String key = keyGenerator();
 		TabKey.add(key);
 
-		while(counter < plaintext.length){
-			ciphertext[2*counter] = plaintext[2*counter+1];
-			ciphertext[2*counter+1] = plaintext[2*counter] ^ pseudo(plaintext[2*counter+1], key);	
+		while(counter < plaintext.length()){
+			ciphertext.charAt(2*counter) = plaintext.charAt(2*counter+1);
+			ciphertext.charAt(2*counter+1) = plaintext.charAt(2*counter) ^ pseudo(plaintext.charAt(2*counter+1), key);	
 			counter++;
 		}
 	}
 
-	public String encrypt(String plaintext, int nbtours){
+	public String encrypt(String message, int nbtours){
+		String plaintext = bitsManager.stringToBits(message);
+		ciphertext = plaintext;
+
 		String temp;
 		while(nbtours > 0){
 			simpletour(plaintext);
@@ -56,4 +59,15 @@ public class Feistel {
 		return ciphertext;
 	}
 
+	public String decrypt(String ciphertext, int nbtours){
+		String temp;
+		while(nbtours > 0){
+			simpletour(ciphertext);
+			temp = ciphertext;
+			ciphertext = plaintext;
+			ciphertext = temp;
+			nbtours--;
+		}
+		return plaintext;
+	}
 }

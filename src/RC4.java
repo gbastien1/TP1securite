@@ -1,6 +1,6 @@
 package TP1Securite;
 
-//http://stackoverflow.com/questions/12289717/rc4-encryption-java
+//Found at http://stackoverflow.com/questions/12289717/rc4-encryption-java
 
 public class RC4 {
 
