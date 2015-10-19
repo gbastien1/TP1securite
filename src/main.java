@@ -155,7 +155,7 @@ public class main {
 			}
 			while (Integer.parseInt(userInput) < 1 || Integer.parseInt(userInput) > 2);
 
-			int originalMessageLength = message.length();
+			int originalMessageLength = message.length()*8; //8 bit per character
 
 			System.out.println("Algorithm is " + algorithm + "\n");
 			System.out.println("Message in clear is \"" + message + "\"\n");
