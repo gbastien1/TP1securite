@@ -37,6 +37,16 @@ public class Feistel {
 		String key = keyGenerator();
 		TabKey.add(key);
 
+		/**
+		 * Feistel
+		 * 1- Get message in binary
+		 * 2- pad it so it is a factor of 32
+		 * 3- separate message into chunks of 32 bits
+		 * 4- for each chunk, apply 16 rounds
+		 * 5- round: 	separate 32 bits into 2 x 16 bits
+		 * 				take 2nd, apply pseudo with 1st key, xor this with 1st
+		 * 				take 2nd, append previous, and loop. 
+		 */
 		while(counter < plaintext.length()){
 			ciphertext.charAt(2*counter) = plaintext.charAt(2*counter+1);
 			ciphertext.charAt(2*counter+1) = plaintext.charAt(2*counter) ^ pseudo(plaintext.charAt(2*counter+1), key);	

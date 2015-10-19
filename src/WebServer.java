@@ -9,30 +9,29 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.regex.Pattern;
 
-
 /**
  * Ceci est un simple serveur web dont la structure de base
- * fut implémentée dans un cours de réseau passé. On se sert 
+ * fut implÃ©mentÃ©e dans un cours de rÃ©seau passÃ©. On se sert 
  * de ce serveur web et du navigateur comme client.
  * 
- * @fichiers Les fichiers à lire doivent être dans le répertoire
- * data à la racine du projet
+ * @fichiers Les fichiers Ã  lire doivent Ãªtre dans le rÃ©pertoire
+ * data Ã  la racine du projet
  * 
  * @commandLine Ligne de commande pour lancer le serveur:
- * > java -cp . WebServer no_port
+ * > java -cp . TP1Securite.WebServer no_port
  * 
  * @Utilisation1 Dans le navigateur, il suffit d'entrer l'url
  * localhost:xxxx/algorithme/fichier.txt
- * ce qui a pour effet d'envoyer une requête au serveur via localhost
- * sur le port xxxx pour appliquer l'algorithme spécifié sur le
- * fichier donné.
+ * ce qui a pour effet d'envoyer une requÃªte au serveur via localhost
+ * sur le port xxxx pour appliquer l'algorithme spÃ©cifiÃ© sur le
+ * fichier donnÃ©.
  * 
  * @utilisation2 Un url du type localhost:xxxx/fichier.html
- * fera une requête normale sur un fichier html. Le serveur 
+ * fera une requÃªte normale sur un fichier html. Le serveur 
  * prend en compte les fichiers CSS inclus dans le HTML.
  * 
- * @output après une requête d'un fichier, le serveur répond 
- * une page html, que ce soit celle demandée par /fichier.html,
+ * @output aprÃ¨s une requÃªte d'un fichier, le serveur rÃ©pond 
+ * une page html, que ce soit celle demandÃ©e par /fichier.html,
  * ou un template html contenant la sortie de l'algorithme
  */
 
@@ -61,7 +60,7 @@ public class WebServer {
 	    /**
 	     * Beginning of server code
 	     */
-	    System.out.println("Démarrage du serveur web sur le port " + port_no);
+	    System.out.println("DÃ©marrage du serveur web sur le port " + port_no);
 	    System.out.println("(CTRL+C pour quitter)");
 	    try {
 	      /**
@@ -92,7 +91,7 @@ public class WebServer {
 	        PrintWriter out = new PrintWriter(sockClient.getOutputStream());
 	        
 	        String request = in.readLine();
-	        System.out.println("Requête reçue: "+ request + "\n");
+	        System.out.println("RequÃªte reÃ§ue: "+ request + "\n");
 	        if(request == null) 
 	        {
 	        	out.flush();
@@ -109,7 +108,7 @@ public class WebServer {
 	        	if (arrayReq[0].equals("GET")) 
 	        	{
 	        		/*
-		        	 * Vérification du path donné dans la requête
+		        	 * VÃ©rification du path donnÃ© dans la requÃªte
 		        	 */
 		        	if (arrayReq.length == 3 || (arrayReq.length == 2 && pathRegex.matcher(arrayReq[1]).find())) {
 		        		//si path contient ..
@@ -126,7 +125,7 @@ public class WebServer {
 		        	}
 
 		        	/*
-		        	 * Vérification de la version HTTP donnée dans la requête
+		        	 * VÃ©rification de la version HTTP donnÃ©e dans la requÃªte
 		        	 */
 		        	if ((arrayReq.length == 3 && !httpRegex.matcher(arrayReq[2]).find()) || 
 		        			(arrayReq.length == 2 && !httpRegex.matcher(arrayReq[1]).find())) {
@@ -270,15 +269,16 @@ public class WebServer {
 							else if (algorithm.equals("CBC")) 
 							{
 								CBC cbc = new CBC(filecontent);
+
 							}
 							else if (algorithm.equals("Feistel")) 
 							{
-								Feistel feistel = new Feistel(filecontent);
+								//Feistel feistel = new Feistel(filecontent);
 							}
 							else if (algorithm.equals("Authentication")) 
 							{
 								MAC mac = new MAC();
-								String key = "11100011";
+								String key = "11100011"; //hardcoded for now
 								String signedMessage = mac.sign(filecontent, key);
 								
 
@@ -402,6 +402,10 @@ public class WebServer {
 							else {
 								out.println("404 not found");
 							}*/
+
+
+
+
 				        }
 			        else {
 			        	out.println("400 Bad Request");

@@ -28,7 +28,7 @@ public class MAC {
 	public String sign(String message, String key) {
 		BitsManager bitsManager = new BitsManager();
 		Hach hashFct = new Hach();
-		String ipad = "00110110";
+		String ipad = "00110110"; //taken as is from notes
 		String opad = "01011100";
 		int ipad_int = Integer.parseInt(ipad, 2); //returns int value of binary string
 		int opad_int = Integer.parseInt(opad, 2);
@@ -53,7 +53,7 @@ public class MAC {
 	
 
 	public String compare(String encryptedMessage, String hashcode) {
-		
+
 		return null;
 	}
 	
