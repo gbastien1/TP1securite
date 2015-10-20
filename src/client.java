@@ -21,7 +21,7 @@ public class Client {
 			case 2: algo = "RC4"; break;
 			case 3: algo = "Hach"; break;
 			case 4: algo = "MAC"; break;
-			case 5: algo = null;
+			case 5: algo = "CBC";
 		}
 		return algo;
 	}
@@ -40,7 +40,7 @@ public class Client {
 		BufferedReader in;
 		PrintWriter out;
 		
-		System.out.println("Démarrage du client sur le port " + no_port);
+		System.out.println("Demarrage du client sur le port " + no_port);
 		
 		try {
 	      /**
@@ -76,14 +76,15 @@ public class Client {
 						+ "1- Feistel\n"
 						+ "2- RC4\n"
 						+ "3- Hach\n"
-						+ "4- MAC\n");
+						+ "4- MAC\n"
+						+ "5- CBC");
 				userInput = userInputBR.readLine();
-				if (Integer.parseInt(userInput) < 1 || Integer.parseInt(userInput) > 4) {
-					System.out.println("Please choose between 1 and 4.\n");
+				if (Integer.parseInt(userInput) < 1 || Integer.parseInt(userInput) > 5) {
+					System.out.println("Please choose between 1 and 5.\n");
 				}
 				algorithm = getAlgorithm(Integer.parseInt(userInput));
 			}
-			while (Integer.parseInt(userInput) < 1 || Integer.parseInt(userInput) > 4);
+			while (Integer.parseInt(userInput) < 1 || Integer.parseInt(userInput) > 5);
 
 			//choose between plain text from console or text from file
 			String message = "";
@@ -126,8 +127,6 @@ public class Client {
 				out.println(algorithm);
 				out.println(message);
 
-
-
 				//apply algorithm to message
 				String key = in.readLine();
 				String encryptedMessage = in.readLine();
@@ -137,10 +136,10 @@ public class Client {
 					//TODO
 				}
 				else if (algorithm.equals("RC4")) {
-					//transform String key to int [] TODO
+					//transform String key to int []
 					int[] RC4_key = new int[32];
 					for (int i = 0; i < key.length(); i++) {
-						RC4_key[i] = key.charAt(i);
+						RC4_key[i] = (int) key.charAt(i) - 48;
 					}
 					RC4 rc4 = new RC4(RC4_key);
 					message = rc4.decrypt(encryptedMessage);
@@ -151,25 +150,28 @@ public class Client {
 				else if (algorithm.equals("MAC")) {
 					//generate key for encryption
 					//transform String key to int
-					int MAC_key = Integer.parseInt(key); //get 8 bit key
+					int MAC_key = Integer.parseInt(key, 2); //get 8 bit key
 					MAC mac = new MAC();
-					boolean identical = mac.compare(encryptedMessage, Integer.toBinaryString(MAC_key), originalMessageLength);
+					boolean identical = mac.compare(encryptedMessage, MAC_key, originalMessageLength);
 
 					if(identical) {
-						message = "La comparaison a fonctionné! C'est bel et bien server qui a envoyé le message!";
+						message = "La comparaison a fonctionne! C'est bel et bien server qui a envoye le message!";
 					}
 					else {
-						message = "La comparaison a échoué! le message a été modifié!";
+						message = "La comparaison a echoue! le message a ete modifie!";
 					}
+				}
+				else if (algorithm.equals("CBC")) {
+
 				}
 				else {
 					System.out.println("Mauvais algorithme! Choix possibles: [Feistel, RC4, Hach, MAC].\n");
 				}
 
 				//send decrypted message to server
-				System.out.println("Message déchiffré: " + message);
+				System.out.println("Message dechiffre: " + message);
 				
-				
+				out.flush();
 				
 			}	
 		

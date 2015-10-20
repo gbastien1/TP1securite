@@ -89,6 +89,7 @@ public class Server {
 					out.println(key);
 
 					RC4 rc4 = new RC4(RC4_key);
+					//RC4 rc4 = new RC4(RC4_key);
 					encryptedMessage = rc4.encrypt(message);
 				}
 				else if (algorithm.equals("Hach")) {
@@ -103,11 +104,14 @@ public class Server {
 					int MAC_key = rand.nextInt(256); //get 8 bit key
 					//key in string
 					String string_key = "";
-					string_key += (char) MAC_key;
+					string_key += Integer.toBinaryString(MAC_key);
 					out.println(string_key);
 
 					//encrypt
-					encryptedMessage = mac.sign(message, Integer.toBinaryString(MAC_key));
+					encryptedMessage = mac.sign(message, MAC_key);
+				}
+				else if (algorithm.equals("CBC")) {
+					
 				}
 				else {
 					System.out.println("Mauvais algorithme! Choix possibles: [Feistel, RC4, Hach, MAC].\n");

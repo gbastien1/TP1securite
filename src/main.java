@@ -12,11 +12,23 @@ public class main {
 	protected static int MAC_key;
 	protected static int[] RC4_key;
 
-	private static int[] generateKey(int length) {
+	private static int[] generateRC4Key(int length) {
 		Random rand = new Random();
 		int[] key = new int[length];
 		for (int i = 0; i < length; i++) {
 			key[i] = rand.nextInt(1);
+		}
+		return key;
+	}
+
+	private static String generateFeistelKey() 
+	{ 
+		Random rand = new Random();
+		String key = "";
+		for(int i = 0; i < 16; i++)
+		{
+			int randomNumber = rand.nextInt(1) + 0;
+			key += Integer.toString(randomNumber);
 		}
 		return key;
 	}
@@ -48,8 +60,10 @@ public class main {
 
 		}
 		else if (algorithm.equals("RC4")) {
-			RC4_key = generateKey(32);
-			RC4 rc4 = new RC4(RC4_key);
+			RC4_key = generateRC4Key(32);
+			//RC4 rc4 = new RC4(RC4_key);
+			int[] cle = new int[]{0,1,0,0,1,1,0,1,0,1,1,1,0,1,0,0,0,1,1,0,1,0,1,1,0,1,0,0,0,0,1,1};
+			RC4 rc4 = new RC4(cle);
 			encryptedMessage = rc4.encrypt(message);
 		}
 		else if (algorithm.equals("Hach")) {
@@ -62,7 +76,7 @@ public class main {
 			Random rand = new Random();
 			MAC_key = rand.nextInt(256); //get 8 bit key
 			//encrypt
-			encryptedMessage = mac.sign(message, Integer.toBinaryString(MAC_key));
+			encryptedMessage = mac.sign(message,MAC_key);
 		}
 		else {
 			System.out.println("Mauvais algorithme! Choix possibles: [Feistel, RC4, Hach, MAC].\n");
@@ -79,7 +93,8 @@ public class main {
 	public static String client(String encryptedMessage, String algorithm, int originalMessageLength) {
 		String message = "";
 		if (algorithm.equals("Feistel")) {
-
+			//String key = generateFeistelKey();
+			//Feistel feistel = new Feistel();
 		}
 		else if (algorithm.equals("RC4")) {
 			RC4 rc4 = new RC4(RC4_key);
@@ -90,7 +105,7 @@ public class main {
 		}
 		else if (algorithm.equals("MAC")) {
 			MAC mac = new MAC();
-			boolean identical = mac.compare(encryptedMessage, Integer.toBinaryString(MAC_key), originalMessageLength);
+			boolean identical = mac.compare(encryptedMessage, MAC_key, originalMessageLength);
 
 			if(identical) {
 				message = "La comparaison a fonctionné! C'est bel et bien server qui a envoyé le message!";

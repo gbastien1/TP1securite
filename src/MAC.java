@@ -25,18 +25,17 @@ public class MAC {
 	 * @param  key     the "secret" key used in HMAC in binary
 	 * @return         the hashcode in binary used as signature
 	 */
-	public String sign(String message, String key) {
+	public String sign(String message, int key) {
 		BitsManager bitsManager = new BitsManager();
 		Hach hashFct = new Hach();
 		String ipad = "00110110"; //taken as is from notes
 		String opad = "01011100";
 		int ipad_int = Integer.parseInt(ipad, 2); //returns int value of binary string
 		int opad_int = Integer.parseInt(opad, 2);
-		int key_int = Integer.parseInt(key, 2);
 		String messageBits = bitsManager.stringToBits(message); //to transform a string to its bits string equivalent
 
 		//XOR between ipad and key
-		int xor_key_ipad = ipad_int ^ key_int;
+		int xor_key_ipad = ipad_int ^ key;
 		String xor_key_ipad_binary = Integer.toBinaryString(xor_key_ipad);
 		//append message to previous XOR
 		xor_key_ipad_binary += messageBits;
@@ -44,7 +43,7 @@ public class MAC {
 		String hashed_ipad = hashFct.hachMessage(xor_key_ipad_binary);
 
 		//same with opad
-		int xor_key_opad = opad_int ^ key_int;
+		int xor_key_opad = opad_int ^ key;
 		String xor_key_opad_binary = Integer.toBinaryString(xor_key_opad);
 		xor_key_opad_binary += hashed_ipad;
 
@@ -60,7 +59,7 @@ public class MAC {
 	 * @param  key  		the secret key the client knows
 	 * @return              boolean true if comparison matched, false otherwise
 	 */
-	public boolean compare(String encryptedMessage, String key, int originalMessageLength) {
+	public boolean compare(String encryptedMessage, int key, int originalMessageLength) {
 		BitsManager bitsManager = new BitsManager();
 		String server_mess = encryptedMessage.substring(0, originalMessageLength);
 		String server_hashcode = encryptedMessage.substring(originalMessageLength, encryptedMessage.length());
