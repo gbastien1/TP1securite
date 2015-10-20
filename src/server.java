@@ -9,6 +9,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Random;
 
+/**
+ * TP1 SÉCURITÉ PHILIPPE RHEAUME ET GABRIELLE BASTIEN 
+ */
+
 public class Server {
 	
 	private static int[] generateRC4Key(int length) {
@@ -16,6 +20,18 @@ public class Server {
 		int[] key = new int[length];
 		for (int i = 0; i < length; i++) {
 			key[i] = rand.nextInt(2);
+		}
+		return key;
+	}
+
+	private static String generateFeistelKey() 
+	{ 
+		Random rand = new Random();
+		String key = "";
+		for(int i = 0; i < 16; i++)
+		{
+			int randomNumber = rand.nextInt(1) + 0;
+			key += Integer.toString(randomNumber);
 		}
 		return key;
 	}
@@ -76,8 +92,10 @@ public class Server {
 				 * template back to browser
 				 */
 				if (algorithm.equals("Feistel")) {
-					out.println("key");
-					//TODO
+					Feistel feistel = new Feistel();
+					String key = generateFeistelKey();
+					out.println(key);
+					encryptedMessage = feistel.encrypt(message, key, 16);
 				}
 				else if (algorithm.equals("RC4")) {
 					int[] RC4_key = generateRC4Key(32);
@@ -123,6 +141,7 @@ public class Server {
 	        }
 	        catch (Exception e)
 	        {
+	        	e.printStackTrace();
 	        	System.out.print(e.toString());
 	        	out.println("500 internal server error");
 	        }

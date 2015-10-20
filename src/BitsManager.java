@@ -1,6 +1,9 @@
 package TP1Securite;
 
 import java.util.ArrayList;
+/**
+ * TP1 SÉCURITÉ PHILIPPE RHEAUME ET GABRIELLE BASTIEN 
+ */
 
 /**
  * This manipulates strings to transform them to bits
@@ -68,6 +71,13 @@ public class BitsManager {
 	 	return number % factor == 0;
 	}
 
+	/**
+	 * Splits a binary string into chunks of bits of chunkSize bits, 
+	 * but first pads the string with a factor of chunkSize bits
+	 * @param  bits      the message to split in chunks in binary
+	 * @param  chunkSize taille des blocs
+	 * @return           tableau de blocs
+	 */
 	public String[] splitInChunks(String bits, int chunkSize) {
 		ArrayList<String> chunks = new ArrayList<String>();
 

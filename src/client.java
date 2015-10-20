@@ -34,6 +34,8 @@ public class Client {
 		}
 		return key;
 	}
+
+	
 	
 	protected void start(int no_port) {
 		Socket socket;
@@ -132,10 +134,13 @@ public class Client {
 				String encryptedMessage = in.readLine();
 				System.out.println("Message chiffre recu du serveur: " + encryptedMessage);
 
-				if (algorithm.equals("Feistel")) {
-					//TODO
+				if (algorithm.equals("Feistel")) 
+				{					
+					Feistel feistel = new Feistel();
+					message = feistel.decrypt(encryptedMessage, key, 16);
 				}
-				else if (algorithm.equals("RC4")) {
+				else if (algorithm.equals("RC4")) 
+				{
 					//transform String key to int []
 					int[] RC4_key = new int[32];
 					for (int i = 0; i < key.length(); i++) {
@@ -144,10 +149,12 @@ public class Client {
 					RC4 rc4 = new RC4(RC4_key);
 					message = rc4.decrypt(encryptedMessage);
 				}
-				else if (algorithm.equals("Hach")) {
+				else if (algorithm.equals("Hach")) 
+				{
 					message = "Impossible d'effectuer le hachage en sens inverse.";
 				}
-				else if (algorithm.equals("MAC")) {
+				else if (algorithm.equals("MAC")) 
+				{
 					//generate key for encryption
 					//transform String key to int
 					int MAC_key = Integer.parseInt(key, 2); //get 8 bit key
