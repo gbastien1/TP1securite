@@ -26,43 +26,69 @@ public class Feistel {
 		return result;
 	}
 
-	private String keyGenerator() 
-	{ //key fourni ?
-		Random rand = new Random();
-		String key;
-		for(int i = 0; i < 16; i++)
-		{
-			int randomNumber = rand.nextInt(1) + 0;
-			key += Integer.toString(randomNumber);
-		}
-		return key;
-	}
-
-	private String simpletour(String left, String right){ // Ajouter Key
+	private String simpletour(String left, String right, String key){ // Ajouter Key
 		int counter = 0;
-//		String key = keyGenerator();
-//		TabKey.add(key);
 		String temp = null;
 		temp = F(right, key);
-		temp = temp ^ left;
-		return = right + temp;
+		int x = Integer.parseInt(temp,2) ^ Integer.parseInt(left,2);
+		temp = Integer.toBinaryString(x);
+		return right + temp;
 	}
 
 	public String encrypt(String message, String key, int nbtours){
+		BitsManager bitsManager = new BitsManager();
 		String bits = bitsManager.stringToBits(message);
-		String[] plaintext = bitsManager.splitInChunks(bits, 32)
+		String[] plaintext = bitsManager.splitInChunks(bits, 32);
 		String[] ciphertext = plaintext;
+		String keyTemp = "";
+		String encryptedMessage = "";
 
-		for(int i = 0; i < plaintext.lenght();i++)
+		for(int i = 0; i < plaintext.length;i++)
 		{
 			while(nbtours > 0)
 			{
-				ciphertext[i] = simpletour(ciphertext[i].substring(0,15), plaintext.substring(15));
+				ciphertext[i] = simpletour(ciphertext[i].substring(0,16), ciphertext[i].substring(16), key);
+				keyTemp = Character.toString(key.charAt(0));
+				key = key.substring(1,15);
+				key += keyTemp;
 				nbtours--;
 			}
+			ciphertext[i] = ciphertext[i].substring(16) + ciphertext[i].substring(0,16);
 		}
 
-		return ciphertext = ciphertext.substring(15) + ciphertext.substring(0,15);
+		for(int i = 0; i < ciphertext.length; i++)
+		{
+			encryptedMessage += ciphertext[i];
+		}
+		return encryptedMessage;
+	}
+
+	public String decrypt(String message, String key, int nbtours){
+		BitsManager bitsManager = new BitsManager();
+		String bits = bitsManager.stringToBits(message);
+		String[] plaintext = bitsManager.splitInChunks(bits, 32);
+		String[] ciphertext = plaintext;
+		String keyTemp = "";
+		String decryptedMessage = "";
+
+		for(int i = 0; i < plaintext.length;i++)
+		{
+			while(nbtours > 0)
+			{
+				ciphertext[i] = simpletour(ciphertext[i].substring(0,16), ciphertext[i].substring(16), key);
+				keyTemp = Character.toString(key.charAt(15));
+				key = key.substring(0,15);
+				key = keyTemp + key;
+				nbtours--;
+			}
+			ciphertext[i] = ciphertext[i].substring(16) + ciphertext[i].substring(0,16);
+		}
+
+		for(int i = 0; i < ciphertext.length; i++)
+		{
+			decryptedMessage += ciphertext[i];
+		}
+		return decryptedMessage;
 	}
 
 
